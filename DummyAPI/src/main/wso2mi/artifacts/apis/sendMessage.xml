@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/sendmessage" name="sendMessage" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" uri-template="/v1">
+        <inSequence>
+            <log level="full">
+                <property name="API" value="callApi--------" />
+            </log>
+
+            <property name="to" expression="json-eval($.to)" scope="default" />
+            <property name="messageId" expression="json-eval($.messageId)" scope="default" />
+
+            <payloadFactory description="Create response payload" media-type="json">
+                <format>
+                    {
+                        "to": "$1",
+                        "messageCount": 1,
+                        "messageId": "$2",
+                        "status": "PENDING",
+                        "description": "Message sent to next instance"
+                    }
+                </format>
+                    <args>
+                        <arg evaluator="xml" expression="get-property('to')" />
+                        <arg evaluator="xml" expression="get-property('messageId')" />
+                    </args>
+            </payloadFactory>
+
+            <respond />
+        </inSequence>
+        <faultSequence>
+        </faultSequence>
+    </resource>
+</api>

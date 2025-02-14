@@ -1,0 +1,72 @@
+<api xmlns="http://ws.apache.org/ns/synapse" name="VerifyIDAPI" context="/verify">
+    <resource methods="POST" uri-template="/nricValidate">
+        <inSequence>
+            <property name="last6DigitNo" expression="json-eval($.last6DigitNo)" scope="default" type="STRING"/>
+            <log level="full">
+                <property name="ReceivedLast6DigitNo" expression="get-property('last6DigitNo')"/>
+            </log>
+            <script language="js"><![CDATA[
+                var last6DigitNo = mc.getProperty("last6DigitNo");
+                var address = "";
+                var unifiId = "";
+
+                if (last6DigitNo === "123456") {
+                    var addressList = ["Alan Bangsar", "Sasha Ampang", "Jalan Bukit Bintang"];
+                    var randomIndex = Math.floor(Math.random() * addressList.length);
+                    address = addressList[randomIndex];
+                    var firstName = address.split(" ")[0];
+                    unifiId = firstName.toLowerCase() + Math.floor(Math.random() * 1000) + "@unifi";
+                    mc.setProperty("result", "true");
+                } else if (last6DigitNo === "456789") {
+                    var addressList2 = ["Mike Klang", "Sophia Setapak", "Jalan Petaling"];
+                    var randomIndex2 = Math.floor(Math.random() * addressList2.length);
+                    address = addressList2[randomIndex2];
+                    var firstName2 = address.split(" ")[0];
+                    unifiId = firstName2.toLowerCase() + Math.floor(Math.random() * 1000) + "@unifi";
+                    mc.setProperty("result", "true");
+                } else {
+                    mc.setProperty("result", "false");
+                }
+
+                mc.setProperty("dynamicAddress", address);
+                mc.setProperty("dynamicUnifiId", unifiId);
+            ]]></script>
+            <payloadFactory media-type="json" template-type="default">
+                <format>{
+                    "idVerificationStatus": {
+                    "result": "$1",
+                    "address": "$2",
+                    "unifiId": "$3"
+                    }
+                    }</format>
+                <args>
+                    <arg expression="get-property('result')"/>
+                    <arg expression="get-property('dynamicAddress')"/>
+                    <arg expression="get-property('dynamicUnifiId')"/>
+                </args>
+            </payloadFactory>
+            <filter regex="false" source="get-property('result')">
+                <then>
+                    <payloadFactory media-type="json" template-type="default">
+                        <format>{
+                            "idVerificationStatus": {
+                            "result": "false"
+                            }
+                            }</format>
+                        <args/>
+                    </payloadFactory>
+                    <log level="full">
+                        <property name="ErrorPayload" expression="json-eval($.)"/>
+                    </log>
+                </then>
+                <else>
+                    <log level="full">
+                        <property name="SuccessPayload" expression="json-eval($.)"/>
+                    </log>
+                </else>
+            </filter>
+            <respond/>
+        </inSequence>
+        <faultSequence/>
+    </resource>
+</api>

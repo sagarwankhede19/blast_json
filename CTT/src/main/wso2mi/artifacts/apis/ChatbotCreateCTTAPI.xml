@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/chatbotcreatecttapi" name="ChatbotCreateCTTAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" uri-template="/createCTT">
+        <inSequence>
+            <log level="full">
+                <property name="RequestPayload" expression="json-eval($.)"/>
+            </log>
+            <filter regex="Chatbot-001" source="json-eval($.requestHeader.requestId)">
+                <then>
+                    <log level="full">
+                        <property name="RequestIdCheck" value="RequestId is Chatbot-001"/>
+                    </log>
+                    <filter regex="Yes" source="json-eval($.createCtt)">
+                        <then>
+                            <script language="js">
+                                <![CDATA[
+                                var randomCttNo = "Test-" + Math.floor(Math.random() * 10000000000);
+                                mc.setProperty("dynamicCttNo", randomCttNo);
+                                ]]>
+                            </script>
+                            <payloadFactory media-type="json" template-type="default">
+                                <format>{
+                                    "proactiveCttInfo": {
+                                    "cttNo": "$1",
+                                    "validityFlag": "Valid"
+                                    }
+                                    }</format>
+                                <args>
+                                    <arg expression="get-property('dynamicCttNo')"/>
+                                </args>
+                            </payloadFactory>
+                        </then>
+                        <else>
+                            <payloadFactory media-type="json" template-type="default">
+                                <format>{
+                                    "proactiveCttInfo": {
+                                    "validityFlag": "Y"
+                                    }
+                                    }</format>
+                                <args></args>
+                            </payloadFactory>
+                        </else>
+                    </filter>
+                </then>
+                <else>
+                    <payloadFactory media-type="json" template-type="default">
+                        <format>{
+                            "responseHeader": {
+                            "rqUuid": "urn:uuid:028d9b99-22c6-4443-bc77-61776a99833a",
+                            "requestId": "Chatbot-001",
+                            "status": "Error",
+                            "statusCode": 1,
+                            "errorCode": "WSO2000004",
+                            "errorMessage": "Duplicate Request Id",
+                            "errorDetail": "Duplicated Field Value : Request Id",
+                            "errorPayload": ""
+                            }
+                            }</format>
+                        <args></args>
+                    </payloadFactory>
+                </else>
+            </filter>
+            <respond/>
+        </inSequence>
+    </resource>
+</api>

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="process" trace="disable" onError="onErrorSequence" xmlns="http://ws.apache.org/ns/synapse">
+
+    <!-- <script language="js"><![CDATA[throw new Error("This is the reason why the processing has failed.");]]></script> -->
+    <!-- <sequence key="getInfobipConfigsss" /> -->
+    <sequence key="getInfobipConfigs" />
+
+    <filter source="$ctx:hasPlaceholders" regex=".+">
+        <then>
+            <filter xpath="get-property('placeholders') and not(get-property('buttons'))">
+                <then>
+                    <log level="custom">
+                        <property name="INFO" value="Condition: With placeholders without buttons1" />
+                    </log>
+                    <payloadFactory media-type="json">
+                        <format>
+                            {
+                                "messages": [
+                                    {
+                                        "from": "$1",
+                                        "to": "$2",
+                                        "messageId": "$3",
+                                        "content": {
+                                            "templateName": "$4",
+                                            "templateData": {
+                                                "body": {
+                                                    "placeholders": $5
+                                                }
+                                            },
+                                            "language": "$6"
+                                        },
+                                        "callbackData": "Callback data",
+                                        "notifyUrl": "$7"
+                                    }
+                                ]
+                            }
+                        </format>
+                        <args>
+                            <arg evaluator="xml" expression="get-property('from')" />
+                            <arg evaluator="xml" expression="get-property('to')" />
+                            <arg evaluator="xml" expression="get-property('messageId')" />
+                            <arg evaluator="xml" expression="get-property('templateName')" />
+                            <arg evaluator="xml" expression="get-property('placeholders')" />
+                            <arg evaluator="xml" expression="get-property('language')" />
+                            <arg evaluator="xml" expression="get-property('notifyUrl')" />
+                        </args>
+                    </payloadFactory>
+                </then>
+                <else>
+                    <filter xpath="get-property('placeholders') and get-property('buttons')">
+                        <then>
+                            <log level="custom">
+                                <property name="INFO" value="Condition: With placeholders with buttons2" />
+                            </log>
+                            <payloadFactory media-type="json">
+                                <format>
+                                    {
+                                        "messages": [
+                                            {
+                                                "from": "$1",
+                                                "to": "$2",
+                                                "messageId": "$3",
+                                                "content": {
+                                                    "templateName": "$4",
+                                                    "templateData": {
+                                                        "body": {
+                                                            "placeholders": $5
+                                                        },
+                                                        "buttons": $6
+                                                    },
+                                                    "language": "$7"
+                                                },
+                                                "callbackData": "Callback data",
+                                                "notifyUrl": "$8"
+                                            }
+                                        ]
+                                    }
+                                </format>
+                                <args>
+                                    <arg evaluator="xml" expression="get-property('from')" />
+                                    <arg evaluator="xml" expression="get-property('to')" />
+                                    <arg evaluator="xml" expression="get-property('messageId')" />
+                                    <arg evaluator="xml" expression="get-property('templateName')" />
+                                    <arg evaluator="xml" expression="get-property('placeholders')" />
+                                    <arg evaluator="xml" expression="get-property('buttons')" />
+                                    <arg evaluator="xml" expression="get-property('language')" />
+                                    <arg evaluator="xml" expression="get-property('notifyUrl')" />
+                                </args>
+                            </payloadFactory>
+                        </then>
+                        <else>
+                            <filter xpath="not(get-property('placeholders')) and get-property('buttons')">
+                                <then>
+                                    <log level="custom">
+                                        <property name="INFO" value="Condition: Else - Without placeholders with buttons3" />
+                                    </log>
+                                    <payloadFactory media-type="json">
+                                        <format>
+                                            {
+                                                "messages": [
+                                                    {
+                                                        "from": "$1",
+                                                        "to": "$2",
+                                                        "messageId": "$3",
+                                                        "content": {
+                                                            "templateName": "$4",
+                                                            "templateData": {
+                                                                "body": {
+                                                                    "placeholders": [],
+                                                                    "buttons": $5
+                                                                }
+                                                            },
+                                                            "language": "$6"
+                                                        },
+                                                        "callbackData": "Callback data",
+                                                        "notifyUrl": "$7"
+                                                    }
+                                                ]
+                                            }
+                                        </format>
+                                        <args>
+                                            <arg evaluator="xml" expression="get-property('from')" />
+                                            <arg evaluator="xml" expression="get-property('to')" />
+                                            <arg evaluator="xml" expression="get-property('messageId')" />
+                                            <arg evaluator="xml" expression="get-property('templateName')" />
+                                            <arg evaluator="xml" expression="get-property('buttons')" />
+                                            <arg evaluator="xml" expression="get-property('language')" />
+                                            <arg evaluator="xml" expression="get-property('notifyUrl')" />
+                                        </args>
+                                    </payloadFactory>
+                                </then>
+                                <else>
+                                    <log level="custom">
+                                        <property name="INFO" value="Condition: Else - Without placeholders Without buttons4" />
+                                    </log>
+                                    <payloadFactory media-type="json">
+                                        <format>
+                                            {
+                                                "messages": [
+                                                    {
+                                                        "from": "$1",
+                                                        "to": "$2",
+                                                        "messageId": "$3",
+                                                        "content": {
+                                                            "templateName": "$4",
+                                                            "templateData": {
+                                                                "body": {
+                                                                    "placeholders": []
+                                                                }
+                                                            },
+                                                            "language": "$5"
+                                                        },
+                                                        "callbackData": "Callback data",
+                                                        "notifyUrl": "$6"
+                                                    }
+                                                ]
+                                            }
+                                        </format>
+                                        <args>
+                                            <arg evaluator="xml" expression="get-property('from')" />
+                                            <arg evaluator="xml" expression="get-property('to')" />
+                                            <arg evaluator="xml" expression="get-property('messageId')" />
+                                            <arg evaluator="xml" expression="get-property('templateName')" />
+                                            <arg evaluator="xml" expression="get-property('language')" />
+                                            <arg evaluator="xml" expression="get-property('notifyUrl')" />
+                                        </args>
+                                    </payloadFactory>
+                                </else>
+                            </filter>
+                        </else>
+                    </filter>
+                </else>
+            </filter>
+        </then>
+        <else>
+            <payloadFactory media-type="json">
+                <format>
+                    {
+                        "messages": [
+                            {
+                                "from": "$1",
+                                "to": "$2",
+                                "messageId": "$3",
+                                "content": {
+                                    "templateName": "$4",
+                                    "templateData": {
+                                        "body": {
+                                        }
+                                    },
+                                    "language": "$5"
+                                },
+                                "callbackData": "Callback data",
+                                "notifyUrl": "$6"
+                            }
+                        ]
+                    }
+                </format>
+                <args>
+                    <arg evaluator="xml" expression="get-property('from')" />
+                    <arg evaluator="xml" expression="get-property('to')" />
+                    <arg evaluator="xml" expression="get-property('messageId')" />
+                    <arg evaluator="xml" expression="get-property('templateName')" />
+                    <arg evaluator="xml" expression="get-property('language')" />
+                    <arg evaluator="xml" expression="get-property('notifyUrl')" />
+                </args>
+            </payloadFactory>
+        </else>
+    </filter>
+    <header name="Authorization" action="set" scope="transport" expression="get-property('apiKey')" />
+    <!-- <header name="Authorization" action="set" scope="transport" value="SADASD" /> -->
+    <log level="full">
+        <property name="INFO" value="Checking for Client Errors (4xx)" />
+        <property name="HTTP Status Code" expression="get-property('axis2', 'HTTP_SC')"/>
+    </log>
+    <call>
+        <endpoint key="infobipEndpoint" />
+    </call>
+    <property name="statusCode" expression="get-property('axis2', 'HTTP_SC')"/>
+    <log level="full">
+        <property name="HTTP Status Code." expression="get-property('statusCode')"/>
+    </log>
+    
+    <property name="infobipResponse"  expression="json-eval($.)" />
+    <property name="integrationNo" scope="transport" type="STRING" value="I1125" />
+    <property name="type" scope="transport" type="STRING" value="Response Body" />
+
+    <switch source="get-property('statusCode')">
+        <case regex="200">
+            <payloadFactory description="Create response payload" media-type="json">
+                <format>
+                    {
+                        "to": "$1",
+                        "messageCount": $2,
+                        "messageId": "$3",
+                        "status": "$4",
+                        "description": "$5"
+                    }
+                </format>
+                    <args>
+                        <arg evaluator="xml" expression="get-property('to')" />
+                        <arg evaluator="json" expression="json-eval($.messages[0].messageCount)" />
+                        <arg evaluator="json" expression="json-eval($.messages[0].messageId)" />
+                        <arg evaluator="json" expression="json-eval($.messages[0].status.groupName)" />
+                        <arg evaluator="json" expression="json-eval($.messages[0].status.description)" />
+                    </args>
+            </payloadFactory>
+            <property name="tmResponse" expression="json-eval($)" ></property>
+            <log level="full">
+                <property name="tmResponse-- 200" expression="get-property('tmResponse')"/>
+                <property name="statusCode--in  200" expression="get-property('statusCode')"/>
+
+            </log>
+        </case>
+        <case regex="400">
+        <!-- pending need to update -->
+            <payloadFactory description="Create response payload" media-type="json">
+                <format>
+                    {
+                        "to": "$1",
+                        "messageCount": $2,
+                        "messageId": "$3",
+                        "status": "$4",
+                        "description": "$5"
+                    }
+                </format>
+                    <args>
+                        <arg evaluator="xml" expression="get-property('to')" />
+                        <arg evaluator="json" expression="json-eval($.messages[0].messageCount)" />
+                        <arg evaluator="json" expression="json-eval($.messages[0].messageId)" />
+                        <arg evaluator="json" expression="json-eval($.messages[0].status.groupName)" />
+                        <arg evaluator="json" expression="json-eval($.messages[0].status.description)" />
+                    </args>
+            </payloadFactory>
+            <property name="tmResponse" expression="json-eval($)" ></property>
+            <log level="full">
+                <property name="tmResponse-- 200" expression="get-property('tmResponse')"/>
+                <property name="statusCode--in  200" expression="get-property('statusCode')"/>
+
+            </log>
+        </case>
+        <default>
+            <log level="custom">
+                <property name="default" value="inside-------default"/>
+            </log>
+            <sequence key="errorSequence" />
+            <log level="full">
+                <property name="default tmResponse-- 200" expression="get-property('tmResponse')"/>
+            </log>
+        </default>
+    </switch>
+
+    <log level="full">
+        <property name="endpoint" value="before endpoint-------"/>
+    </log>
+    <call>
+        <endpoint key="LogAPI" />
+    </call>
+
+    <log level="full">
+        <property name="afendpoint" value="aftere endpoint-------"/>
+        <property name="SC_ACCEPTED (Before Setting)" expression="get-property('axis2', 'SC_ACCEPTED')"/>
+    </log>
+    <property name="SC_ACCEPTED" value="false" scope="axis2"/>
+    <property name="HTTP_SC" expression="get-property('statusCode')" scope="axis2"/>
+    <payloadFactory media-type="json">
+        <format>$1</format>
+        <args>
+            <arg expression="get-property('tmResponse')"></arg>
+        </args>
+    </payloadFactory>
+    <respond />
+
+</sequence>
